@@ -53,10 +53,6 @@ Dirancang untuk freelancer dan pengusaha. Mengamankan buffer survival 1 bulan da
 - ✅ Responsive layout untuk mobile & desktop
 - ✅ Modern UI/UX design
 
-## 🖼️ Demo
-
-> *Screenshot coming soon*
-
 ## 🚀 Installation
 
 ### Prerequisites
