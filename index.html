@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Zetfour Vision - Keuangan Profesional</title>
+    
+    <!-- External Resources: Tailwind CSS & Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: '#4318FF',       // Indigo (Investasi/Primary)
+              secondary: '#6AD2FF',
+              gold: '#F59E0B',        // Amber (Emas)
+              dark: '#2B3674',
+              graytext: '#A3AED0',
+              bg: '#F4F7FE',
+              danger: '#E11D48',      // Rose (Beban Pribadi)
+              warning: '#F97316',     // Orange (Keluarga)
+              social: '#0D9488',      // Teal (Zakat/Sosial)
+              success: '#05CD99'      // Emerald (Aman)
+            },
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
+            boxShadow: {
+              'card': '0 20px 27px 0px rgba(0, 0, 0, 0.05)',
+              'glow': '0 0 20px rgba(67, 24, 255, 0.15)',
+              'nav': '0 -4px 20px rgba(0,0,0,0.05)',
+            }
+          }
+        }
+      }
+    </script>
+
+    <style>
+      body {
+        background-color: #F4F7FE;
+        color: #2B3674;
+        -webkit-font-smoothing: antialiased;
+        -webkit-tap-highlight-color: transparent;
+        padding-bottom: 90px; /* Space for bottom nav on mobile */
+      }
+      
+      @media (min-width: 1024px) {
+        body { padding-bottom: 0; }
+      }
+
+      /* Glassmorphism */
+      .glass-card {
+        background: rgba(255, 255, 255, 1);
+        border: 1px solid rgba(244, 247, 254, 1);
+        box-shadow: 0 20px 27px 0px rgba(0, 0, 0, 0.05);
+      }
+
+      /* Slider Customization */
+      input[type=range] {
+        -webkit-appearance: none;
+        width: 100%;
+        background: transparent;
+      }
+      input[type=range]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        height: 24px;
+        width: 24px;
+        border-radius: 50%;
+        background: #ffffff;
+        border: 4px solid #4318FF;
+        cursor: pointer;
+        margin-top: -10px;
+        box-shadow: 0 4px 10px rgba(67, 24, 255, 0.3);
+        transition: all 0.2s;
+      }
+      input[type=range]::-webkit-slider-runnable-track {
+        width: 100%;
+        height: 6px;
+        cursor: pointer;
+        background: #E0E5F2;
+        border-radius: 99px;
+      }
+      input[type=range]:focus { outline: none; }
+      
+      .slider-danger::-webkit-slider-thumb {
+        border-color: #EE5D50;
+        box-shadow: 0 4px 10px rgba(238, 93, 80, 0.3);
+      }
+      .slider-danger::-webkit-slider-runnable-track {
+        background: #FFDCDA;
+      }
+
+      /* Navigation Active States */
+      .nav-item.active {
+        background-color: #4318FF;
+        color: white;
+        box-shadow: 0 10px 15px -3px rgba(67, 24, 255, 0.3);
+      }
+      .nav-item.active i { color: white; }
+      
+      .bottom-nav-item.active {
+        color: #4318FF;
+      }
+      .bottom-nav-item.active i {
+        fill: rgba(67, 24, 255, 0.1);
+        stroke-width: 2.5px;
+      }
+
+      /* View Transitions */
+      .view-section { display: none; }
+      .view-section.active-view { 
+        display: block; 
+        animation: fadeIn 0.4s ease-out forwards; 
+      }
+      
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      /* Input Focus Animation */
+      .input-group:focus-within label {
+        color: #4318FF;
+      }
+      .input-group:focus-within input {
+        border-color: #4318FF;
+      }
+      
+      /* Smooth transitions for bars */
+      .progress-bar-fill {
+          transition: width 1s ease-in-out, background-color 0.5s ease;
+      }
+
+      /* Custom Checkbox */
+      .custom-checkbox {
+        appearance: none;
+        background-color: #fff;
+        margin: 0;
+        font: inherit;
+        color: currentColor;
+        width: 1.15em;
+        height: 1.15em;
+        border: 2px solid #CBD5E1;
+        border-radius: 0.25em;
+        display: grid;
+        place-content: center;
+        transition: all 0.2s;
+      }
+      .custom-checkbox::before {
+        content: "";
+        width: 0.65em;
+        height: 0.65em;
+        transform: scale(0);
+        transition: 120ms transform ease-in-out;
+        box-shadow: inset 1em 1em white;
+        transform-origin: center;
+        clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+      }
+      .custom-checkbox:checked {
+        background-color: #0D9488; /* Teal/Social Color */
+        border-color: #0D9488;
+      }
+      .custom-checkbox:checked::before {
+        transform: scale(1);
+      }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+    "react/": "https://esm.sh/react@^19.2.4/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="flex h-screen overflow-hidden text-sm md:text-base">
+
+    <!-- DESKTOP SIDEBAR -->
+    <aside class="w-[280px] bg-white h-full hidden lg:flex flex-col py-8 px-6 border-r border-gray-200/50 shadow-card z-20">
+        <div class="flex items-center gap-3 mb-12 px-2">
+           <div class="w-10 h-10 rounded-xl bg-brand flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-brand/30">Z</div>
+           <span class="text-2xl font-bold text-dark tracking-tight">Zetfour Vision</span>
+        </div>
+        <nav class="space-y-4">
+          <div onclick="switchView('dashboard')" id="nav-dash-desktop" class="nav-item active w-full flex items-center gap-4 px-4 py-4 rounded-xl text-graytext hover:bg-bg cursor-pointer transition-all duration-200">
+            <i data-lucide="layout-dashboard" class="w-6 h-6 transition-colors"></i>
+            <span class="text-base font-bold">Harian (Dashboard)</span>
+          </div>
+          <div onclick="switchView('planner')" id="nav-plan-desktop" class="nav-item w-full flex items-center gap-4 px-4 py-4 rounded-xl text-graytext hover:bg-bg cursor-pointer transition-all duration-200">
+            <i data-lucide="pie-chart" class="w-6 h-6 transition-colors"></i>
+            <span class="text-base font-bold">Bulanan (Planner)</span>
+          </div>
+        </nav>
+        <div class="mt-auto flex items-center gap-3 px-4 py-3 bg-bg rounded-2xl border border-gray-100">
+           <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-brand to-secondary flex items-center justify-center text-white font-bold text-sm">U</div>
+           <div>
+             <p class="text-sm font-bold text-dark">Pengguna</p>
+             <p class="text-xs text-graytext">Versi Pro</p>
+           </div>
+        </div>
+    </aside>
+
+    <!-- MOBILE BOTTOM NAVIGATION -->
+    <nav class="lg:hidden fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md border-t border-gray-200 z-50 shadow-nav flex justify-around items-center py-4 px-2 safe-area-pb">
+        <button onclick="switchView('dashboard')" id="nav-dash-mobile" class="bottom-nav-item active flex flex-col items-center gap-1.5 p-2 text-graytext transition-colors w-1/3">
+            <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
+            <span class="text-[10px] font-bold">Harian</span>
+        </button>
+        <button onclick="switchView('planner')" id="nav-plan-mobile" class="bottom-nav-item flex flex-col items-center gap-1.5 p-2 text-graytext transition-colors w-1/3">
+            <i data-lucide="pie-chart" class="w-6 h-6"></i>
+            <span class="text-[10px] font-bold">Bulanan</span>
+        </button>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 flex flex-col h-full overflow-y-auto overflow-x-hidden p-4 md:p-8 relative bg-bg">
+        <!-- Header -->
+        <header class="flex flex-row flex-wrap justify-between items-center mb-8 gap-4">
+           <div class="flex-1 min-w-[150px]">
+             <!-- Mobile Logo Integration -->
+             <div class="lg:hidden flex items-center gap-2 mb-2">
+                <div class="w-8 h-8 rounded-lg bg-brand flex items-center justify-center text-white font-bold text-lg shadow-md">Z</div>
+                <span class="text-xl font-bold text-dark tracking-tight">Zetfour Vision</span>
+             </div>
+             
+             <p class="text-sm text-graytext font-medium mb-1 hidden md:block">Analisis Keuangan Cerdas</p>
+             <h1 class="text-2xl md:text-3xl font-bold text-dark whitespace-nowrap" id="header-title">Ringkasan</h1>
+           </div>
+           
+           <div class="flex items-center gap-2 md:gap-4">
+              <!-- Privacy Toggle -->
+              <button id="privacyBtn" onclick="togglePrivacy()" class="flex items-center gap-2 px-3 md:px-5 py-2.5 bg-white border border-gray-200 rounded-full shadow-sm text-sm font-bold text-dark hover:bg-gray-50 active:bg-gray-100 transition-all cursor-pointer">
+                 <i data-lucide="eye" class="w-4 h-4"></i>
+                 <span id="privacyText" class="hidden md:inline">Lihat Saldo</span>
+                 <span class="md:hidden">Lihat</span>
+              </button>
+           </div>
+        </header>
+
+        <!-- VIEW 1: DASHBOARD (Alokator Harian) -->
+        <section id="dashboard-view" class="view-section active-view max-w-[1600px] pb-24 lg:pb-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Inputs & Slider -->
+                <div class="space-y-6">
+                    <div class="glass-card rounded-[24px] p-6 md:p-8">
+                        <h3 class="text-xl font-bold text-dark mb-6 flex items-center gap-2">
+                            Alokasi Cepat (Harian)
+                            <i data-lucide="zap" class="w-4 h-4 text-brand"></i>
+                        </h3>
+                        <p class="text-xs text-graytext mb-4">Gunakan ini untuk membagi sisa uang harian ke Emas/Tunai.</p>
+                        <div class="space-y-5">
+                            <div class="input-group">
+                                <label class="text-sm font-bold text-graytext mb-2 block transition-colors">Pemasukan Hari Ini</label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-brand font-bold">Rp</span>
+                                    <input type="text" id="dashIncome" inputmode="numeric"
+                                        oninput="handleInput(this, 'dashboard', 'income')"
+                                        class="w-full bg-bg border border-transparent rounded-2xl py-4 pl-12 pr-4 text-dark font-bold text-xl outline-none transition-all placeholder-gray-300"
+                                        placeholder="0">
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <label class="text-sm font-bold text-graytext mb-2 block transition-colors">Pengeluaran Hari Ini</label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-danger font-bold">Rp</span>
+                                    <input type="text" id="dashExpense" inputmode="numeric"
+                                        oninput="handleInput(this, 'dashboard', 'expense')"
+                                        class="w-full bg-bg border border-transparent rounded-2xl py-4 pl-12 pr-4 text-dark font-bold text-xl outline-none transition-all placeholder-gray-300"
+                                        placeholder="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card rounded-[24px] p-6 md:p-8 relative">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xl font-bold text-dark">Strategi Alokasi</h3>
+                            <span class="px-3 py-1 bg-bg text-brand rounded-lg text-xs font-bold">Otomatis</span>
+                        </div>
+
+                        <div class="bg-bg rounded-2xl p-6 md:p-8">
+                            <div class="flex justify-between text-sm font-bold text-graytext mb-6">
+                                <span id="cashLabel" class="text-brand">Prioritas Tunai</span>
+                                <span id="goldLabel">Prioritas Emas</span>
+                            </div>
+
+                            <div class="relative h-6 mb-6">
+                                <input type="range" id="goldSlider" min="0" max="100" value="40" 
+                                    oninput="handleSlider(this)"
+                                    class="w-full absolute z-20 opacity-0 cursor-pointer h-full">
+                                <div class="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                    <div id="sliderTrack" class="h-full bg-gradient-to-r from-brand to-gold w-[40%] transition-all duration-75"></div>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between mt-2 items-center">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-3 h-3 rounded-full bg-brand"></div>
+                                    <span class="text-sm font-bold text-dark" id="cashPctText">Tunai: 60%</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-3 h-3 rounded-full bg-gold"></div>
+                                    <span class="text-sm font-bold text-dark" id="goldPctText">Emas: 40%</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Safety Warning -->
+                            <div id="safetyAlert" class="hidden mt-4 p-3 bg-red-100 rounded-lg flex items-center gap-2 text-danger text-xs font-bold animate-pulse">
+                                <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+                                Batas Aman Investasi Emas Maksimal 75%!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Result Cards -->
+                <div class="space-y-6">
+                    <div class="bg-brand rounded-[24px] p-8 text-white shadow-xl shadow-brand/20 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+                        <p class="text-white/70 font-medium mb-1">Surplus Harian (Sisa)</p>
+                        <h2 class="text-4xl md:text-5xl font-bold mb-8 tracking-tight break-words" id="surplusDisplay">Rp 0</h2>
+
+                        <div class="grid grid-cols-2 gap-4 relative z-10">
+                            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i data-lucide="shield" class="w-4 h-4 text-blue-200"></i>
+                                    <span class="text-sm font-bold text-blue-100">Simpan Tunai</span>
+                                </div>
+                                <p class="text-lg md:text-xl font-bold" id="cashTargetDisplay">Rp 0</p>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i data-lucide="coins" class="w-4 h-4 text-amber-200"></i>
+                                    <span class="text-sm font-bold text-amber-100">Beli Emas</span>
+                                </div>
+                                <p class="text-lg md:text-xl font-bold" id="goldTargetDisplay">Rp 0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card rounded-[24px] p-6 md:p-8">
+                        <h3 class="text-xl font-bold text-dark mb-4">Persentase Penggunaan</h3>
+                        <div class="flex justify-between items-center p-4 bg-bg rounded-2xl mb-3">
+                            <span class="text-sm font-bold text-graytext">Biaya</span>
+                            <span class="text-sm font-bold text-dark" id="expensePct">0%</span>
+                        </div>
+                        <div class="flex justify-between items-center p-4 bg-bg rounded-2xl">
+                            <span class="text-sm font-bold text-graytext">Sisa (Investasi)</span>
+                            <span class="text-sm font-bold text-dark" id="investPct">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 2: PLANNER (Advanced Analysis - REVAMPED) -->
+        <section id="planner-view" class="view-section max-w-[1600px] pb-24 lg:pb-10">
+            
+            <!-- TOP: Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="glass-card rounded-2xl p-5 flex items-center justify-between border-l-4 border-l-brand">
+                    <div>
+                        <p class="text-xs text-graytext font-bold uppercase tracking-wider">Total Pemasukan</p>
+                        <h3 class="text-xl font-bold text-dark mt-1" id="sumIncome">Rp 0</h3>
+                    </div>
+                    <div class="p-2 bg-brand/10 rounded-full text-brand"><i data-lucide="wallet" class="w-5 h-5"></i></div>
+                </div>
+                <div class="glass-card rounded-2xl p-5 flex items-center justify-between border-l-4 border-l-danger">
+                    <div>
+                        <p class="text-xs text-graytext font-bold uppercase tracking-wider">Total Pengeluaran</p>
+                        <h3 class="text-xl font-bold text-dark mt-1" id="sumLoad">Rp 0</h3>
+                    </div>
+                    <div class="p-2 bg-danger/10 rounded-full text-danger"><i data-lucide="trending-down" class="w-5 h-5"></i></div>
+                </div>
+                <div class="glass-card rounded-2xl p-5 flex items-center justify-between border-l-4 border-l-success">
+                    <div>
+                        <p class="text-xs text-graytext font-bold uppercase tracking-wider">Potensi Investasi</p>
+                        <h3 class="text-xl font-bold text-dark mt-1" id="sumNet">Rp 0</h3>
+                    </div>
+                    <div class="p-2 bg-success/10 rounded-full text-success"><i data-lucide="piggy-bank" class="w-5 h-5"></i></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Col 1: Inputs (4 Columns Width) -->
+                <div class="lg:col-span-4 glass-card rounded-[24px] p-6 shadow-card flex flex-col h-full">
+                    <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+                        <div class="w-10 h-10 rounded-full bg-brand/10 flex items-center justify-center text-brand">
+                            <i data-lucide="edit-3" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-dark">Data Perencana</h3>
+                            <p class="text-xs text-graytext">Input data untuk analisis real-time</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6 flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                        <!-- Group: Pemasukan -->
+                        <div class="bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
+                             <div class="flex items-center gap-2 mb-3">
+                                 <i data-lucide="arrow-up-circle" class="w-4 h-4 text-brand"></i>
+                                 <span class="text-sm font-bold text-dark">Pemasukan</span>
+                             </div>
+                             <div class="input-group">
+                                <label class="text-xs font-bold text-graytext mb-1 block">Gaji / Freelance / Beasiswa</label>
+                                <input type="text" id="planIncome" inputmode="numeric"
+                                    oninput="handleInput(this, 'planner', 'income')"
+                                    class="w-full bg-white border border-gray-200 rounded-xl py-3 px-4 text-dark font-bold outline-none focus:border-brand transition-colors text-right"
+                                    placeholder="0">
+                             </div>
+                             <!-- Zakat Checkbox -->
+                             <div class="mt-4 flex items-center gap-3 p-2 bg-white rounded-lg border border-gray-200 hover:border-social transition-colors cursor-pointer" onclick="document.getElementById('planZakatToggle').click()">
+                                <input type="checkbox" id="planZakatToggle" onchange="toggleZakat(event)" class="custom-checkbox text-social">
+                                <div>
+                                    <label class="text-xs font-bold text-gray-700 cursor-pointer block select-none">
+                                        Aktifkan Zakat/Sosial (2.5%)
+                                    </label>
+                                    <p class="text-[10px] text-gray-400">Otomatis hitung dari Gaji</p>
+                                </div>
+                             </div>
+                        </div>
+
+                        <!-- Group: Pengeluaran -->
+                        <div class="bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
+                             <div class="flex items-center gap-2 mb-3">
+                                 <i data-lucide="arrow-down-circle" class="w-4 h-4 text-danger"></i>
+                                 <span class="text-sm font-bold text-dark">Pengeluaran Rutin</span>
+                             </div>
+                             <div class="space-y-4">
+                                 <div class="input-group">
+                                    <label class="text-xs font-bold text-graytext mb-1 block">Pribadi (Makan, Kost, Transport)</label>
+                                    <input type="text" id="planPersonalExp" inputmode="numeric"
+                                        oninput="handleInput(this, 'planner', 'personalExp')"
+                                        class="w-full bg-white border border-gray-200 rounded-xl py-3 px-4 text-dark font-bold outline-none focus:border-danger transition-colors text-right"
+                                        placeholder="0">
+                                 </div>
+                                 <div class="input-group">
+                                    <label class="text-xs font-bold text-graytext mb-1 block">Keluarga (Transfer Orang Tua/Adik)</label>
+                                    <input type="text" id="planFamilySupport" inputmode="numeric"
+                                        oninput="handleInput(this, 'planner', 'familySupport')"
+                                        class="w-full bg-white border border-gray-200 rounded-xl py-3 px-4 text-dark font-bold outline-none focus:border-warning transition-colors text-right"
+                                        placeholder="0">
+                                 </div>
+                             </div>
+                        </div>
+
+                        <!-- Group: Aset -->
+                        <div class="bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
+                             <div class="flex items-center gap-2 mb-3">
+                                 <i data-lucide="safe" class="w-4 h-4 text-success"></i>
+                                 <span class="text-sm font-bold text-dark">Aset Likuid</span>
+                             </div>
+                             <div class="input-group">
+                                <label class="text-xs font-bold text-graytext mb-1 block">Total Tabungan Tunai Saat Ini</label>
+                                <input type="text" id="planSavings" inputmode="numeric"
+                                    oninput="handleInput(this, 'planner', 'currentSavings')"
+                                    class="w-full bg-white border border-gray-200 rounded-xl py-3 px-4 text-dark font-bold outline-none focus:border-success transition-colors text-right"
+                                    placeholder="0">
+                             </div>
+                             <p class="text-[10px] text-graytext mt-2 text-right italic">*Digunakan untuk menghitung Runway</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Col 2: Visualization (4 Columns Width) - ULTRA PROFESSIONAL REDESIGN -->
+                <div class="lg:col-span-4 glass-card rounded-[24px] p-6 md:p-8 shadow-card flex flex-col relative overflow-hidden">
+                    <div class="mb-4 relative z-10 flex justify-between items-start">
+                        <div>
+                            <h3 class="text-lg font-bold text-dark">Komposisi Pengeluaran</h3>
+                            <p class="text-xs text-graytext">Distribusi & Beban Real-time</p>
+                        </div>
+                        <span id="deficitBadge" class="hidden px-3 py-1 bg-red-50 text-red-600 border border-red-100 text-[10px] font-bold rounded-full animate-pulse">
+                            DEFISIT
+                        </span>
+                    </div>
+
+                    <!-- Split Layout: Chart Left, Details Right -->
+                    <div class="flex flex-col xl:flex-row items-center gap-8 h-full">
+                        <!-- Chart Area -->
+                        <div class="relative w-[200px] h-[200px] xl:w-[180px] xl:h-[180px] aspect-square flex-shrink-0">
+                            <canvas id="expenseChart"></canvas>
+                            <!-- Center Text Overlay -->
+                            <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center px-2">
+                                 <span class="text-[9px] text-graytext font-bold uppercase tracking-widest mb-0.5">Total Beban</span>
+                                 <span class="text-sm font-bold text-dark truncate w-full px-1" id="centerLoadText">Rp 0</span>
+                            </div>
+                        </div>
+
+                        <!-- Legend Details (Side List) -->
+                        <div class="flex-1 w-full space-y-3">
+                            <!-- Item: Personal -->
+                            <div class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-colors group">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-2.5 h-2.5 rounded-full bg-danger shadow-sm shadow-danger/40 ring-2 ring-danger/10"></div>
+                                    <div>
+                                        <p class="text-xs font-bold text-gray-700 leading-tight">Pribadi</p>
+                                        <p class="text-[10px] text-gray-400 font-medium" id="pctPersonal">0%</p>
+                                    </div>
+                                </div>
+                                <span class="text-xs font-bold text-dark group-hover:text-danger transition-colors" id="valPersonal">Rp 0</span>
+                            </div>
+
+                            <!-- Item: Family -->
+                            <div class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-colors group">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-2.5 h-2.5 rounded-full bg-warning shadow-sm shadow-warning/40 ring-2 ring-warning/10"></div>
+                                    <div>
+                                        <p class="text-xs font-bold text-gray-700 leading-tight">Keluarga</p>
+                                        <p class="text-[10px] text-gray-400 font-medium" id="pctFamily">0%</p>
+                                    </div>
+                                </div>
+                                <span class="text-xs font-bold text-dark group-hover:text-warning transition-colors" id="valFamily">Rp 0</span>
+                            </div>
+
+                            <!-- Item: Zakat (Hidden by default) -->
+                            <div id="rowZakat" class="hidden flex items-center justify-between p-2 rounded-lg bg-emerald-50/50 border border-emerald-100/50 transition-all">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-2.5 h-2.5 rounded-full bg-social shadow-sm shadow-social/40 ring-2 ring-social/10"></div>
+                                    <div>
+                                        <p class="text-xs font-bold text-teal-800 leading-tight">Zakat (2.5%)</p>
+                                        <p class="text-[10px] text-teal-600/70 font-medium" id="pctZakat">0%</p>
+                                    </div>
+                                </div>
+                                <span class="text-xs font-bold text-social" id="valZakat">Rp 0</span>
+                            </div>
+
+                            <!-- Item: Invest -->
+                            <div class="flex items-center justify-between p-2 rounded-lg bg-indigo-50/50 border border-indigo-100/50 group">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-2.5 h-2.5 rounded-full bg-brand shadow-sm shadow-brand/40 ring-2 ring-brand/10"></div>
+                                    <div>
+                                        <p class="text-xs font-bold text-indigo-900 leading-tight">Investasi</p>
+                                        <p class="text-[10px] text-indigo-400 font-medium" id="pctInvest">0%</p>
+                                    </div>
+                                </div>
+                                <span class="text-xs font-bold text-brand" id="valInvest">Rp 0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Col 3: Health Analysis (4 Columns Width) -->
+                <div class="lg:col-span-4 flex flex-col gap-6">
+                    
+                    <!-- Card: Survival Runway -->
+                    <div class="glass-card rounded-[24px] p-6 shadow-card">
+                         <div class="flex items-center gap-3 mb-4">
+                            <div class="p-2 bg-success/10 rounded-full text-success"><i data-lucide="life-buoy" class="w-5 h-5"></i></div>
+                            <div>
+                                <h3 class="text-lg font-bold text-dark">Survival Runway</h3>
+                                <p class="text-xs text-graytext">Ketahanan Hidup Tanpa Gaji</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-2 mb-4">
+                            <h2 class="text-3xl font-bold text-dark mb-1" id="runwayText">0 Bulan</h2>
+                            <p class="text-xs text-success font-medium leading-relaxed" id="runwayDesc">Menunggu data...</p>
+                        </div>
+
+                        <!-- Horizontal Bar -->
+                        <div class="relative w-full h-8 bg-gray-100 rounded-full overflow-hidden border border-gray-200">
+                             <!-- Markers -->
+                             <div class="absolute top-0 bottom-0 left-[25%] w-px bg-white z-10 border-l border-dashed border-gray-400 opacity-30"></div>
+                             <div class="absolute top-0 bottom-0 left-[50%] w-px bg-white z-10 border-l border-dashed border-gray-400 opacity-30"></div>
+                             <div class="absolute top-0 bottom-0 left-[75%] w-px bg-white z-10 border-l border-dashed border-gray-400 opacity-30"></div>
+
+                             <div id="runwayBar" class="progress-bar-fill h-full bg-danger w-0 rounded-full relative">
+                                  <div class="absolute right-2 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-white rounded-full opacity-50 animate-pulse"></div>
+                             </div>
+                        </div>
+                        <div class="flex justify-between text-[10px] text-graytext font-bold mt-2 px-1">
+                             <span>0</span>
+                             <span>3 Bln</span>
+                             <span>6 Bln</span>
+                             <span>12+</span>
+                        </div>
+                    </div>
+
+                    <!-- Card: Emergency Fund -->
+                    <div class="glass-card rounded-[24px] p-6 shadow-card flex-1">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="p-2 bg-brand/10 rounded-full text-brand"><i data-lucide="shield-check" class="w-5 h-5"></i></div>
+                            <div>
+                                <h3 class="text-lg font-bold text-dark">Target Dana Darurat</h3>
+                                <p class="text-xs text-graytext">Ideal: 6x Total Beban (Hidup + Keluarga)</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                             <div class="flex justify-between items-center p-3 bg-gray-50 rounded-xl border border-gray-100">
+                                <span class="text-xs text-graytext font-bold uppercase">Target (6 Bulan)</span>
+                                <span class="text-base font-bold text-brand" id="efTarget">Rp 0</span>
+                            </div>
+                            
+                            <div>
+                                <div class="flex justify-between text-sm font-bold mb-2">
+                                    <span class="text-dark">Terkumpul</span>
+                                    <span class="text-success" id="efPercent">0%</span>
+                                </div>
+                                <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+                                    <div id="efBar" class="progress-bar-fill h-full bg-success w-0"></div>
+                                </div>
+                                <p class="text-right text-xs text-graytext mt-1 font-medium" id="efCurrent">Rp 0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- LOGIC SCRIPT -->
+    <script>
+        // --- KONFIGURASI ---
+        const KEYS = {
+            DASHBOARD: 'zetfour_dashboard_v1',
+            PLANNER: 'zetfour_planner_v1',
+            PREFS: 'zetfour_prefs'
+        };
+
+        // --- STATE GLOBAL ---
+        const dashboardData = {
+            income: 0,
+            expense: 0,
+            goldRatio: 40
+        };
+
+        const plannerData = {
+            income: 0,
+            personalExp: 0,
+            familySupport: 0,
+            currentSavings: 0,
+            zakatActive: false
+        };
+
+        const globalState = {
+            privacyMode: false,
+            currentView: 'dashboard'
+        };
+
+        let expenseChartInstance = null;
+
+        // --- MANAJEMEN NAVIGASI ---
+        function switchView(viewName) {
+            globalState.currentView = viewName;
+            
+            // Toggle Section
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active-view'));
+            document.getElementById(viewName + '-view').classList.add('active-view');
+            
+            // Toggle Nav Active States
+            document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(el => el.classList.remove('active'));
+            
+            const dNav = document.getElementById(viewName === 'dashboard' ? 'nav-dash-desktop' : 'nav-plan-desktop');
+            if(dNav) dNav.classList.add('active');
+            
+            const mNav = document.getElementById(viewName === 'dashboard' ? 'nav-dash-mobile' : 'nav-plan-mobile');
+            if(mNav) mNav.classList.add('active');
+
+            // Header Title
+            document.getElementById('header-title').innerText = viewName === 'dashboard' ? 'Ringkasan Harian' : 'Perencanaan Bulanan';
+
+            if (viewName === 'planner') {
+                setTimeout(() => calcPlanner(), 100);
+            }
+            
+            lucide.createIcons();
+        }
+
+        // --- STORAGE & INIT ---
+        function loadAllData() {
+            const prefs = localStorage.getItem(KEYS.PREFS);
+            if (prefs) globalState.privacyMode = JSON.parse(prefs).privacyMode || false;
+
+            const dash = localStorage.getItem(KEYS.DASHBOARD);
+            if (dash) Object.assign(dashboardData, JSON.parse(dash));
+            
+            // Set Slider
+            const slider = document.getElementById('goldSlider');
+            if(slider) {
+                slider.value = dashboardData.goldRatio || 40;
+                handleSlider(slider);
+            }
+
+            const plan = localStorage.getItem(KEYS.PLANNER);
+            if (plan) Object.assign(plannerData, JSON.parse(plan));
+            
+            // Set Zakat Checkbox
+            const zakatBox = document.getElementById('planZakatToggle');
+            if(zakatBox) zakatBox.checked = plannerData.zakatActive;
+
+            syncInputs();
+            calcDashboard();
+            calcPlanner();
+        }
+
+        function saveData(type) {
+            if(type === 'dashboard') localStorage.setItem(KEYS.DASHBOARD, JSON.stringify(dashboardData));
+            if(type === 'planner') localStorage.setItem(KEYS.PLANNER, JSON.stringify(plannerData));
+            if(type === 'prefs') localStorage.setItem(KEYS.PREFS, JSON.stringify({ privacyMode: globalState.privacyMode }));
+        }
+
+        // --- UTILS FORMATTING ---
+        function formatMoney(num) {
+            if (globalState.privacyMode) return '••••••';
+            if (isNaN(num)) return 'Rp 0';
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
+        }
+
+        function formatInputDisplay(num) {
+            if (!num && num !== 0) return '';
+            return 'Rp ' + new Intl.NumberFormat('id-ID').format(num);
+        }
+
+        function parseInput(val) {
+            return parseInt(val.replace(/[^0-9]/g, '') || '0', 10);
+        }
+
+        function syncInputs() {
+            // Dashboard
+            document.getElementById('dashIncome').value = formatInputDisplay(dashboardData.income);
+            document.getElementById('dashExpense').value = formatInputDisplay(dashboardData.expense);
+            
+            // Planner
+            document.getElementById('planIncome').value = formatInputDisplay(plannerData.income);
+            document.getElementById('planPersonalExp').value = formatInputDisplay(plannerData.personalExp);
+            document.getElementById('planFamilySupport').value = formatInputDisplay(plannerData.familySupport);
+            document.getElementById('planSavings').value = formatInputDisplay(plannerData.currentSavings);
+        }
+
+        // --- LOGIC: DASHBOARD ---
+        function calcDashboard() {
+            const surplus = dashboardData.income - dashboardData.expense;
+            const effectiveSurplus = Math.max(0, surplus);
+            const goldAlloc = Math.floor(effectiveSurplus * (dashboardData.goldRatio / 100));
+            const cashAlloc = effectiveSurplus - goldAlloc;
+
+            const elSurplus = document.getElementById('surplusDisplay');
+            if(elSurplus) {
+                elSurplus.innerText = (surplus < 0 ? '-' : '') + formatMoney(Math.abs(surplus));
+                document.getElementById('cashTargetDisplay').innerText = formatMoney(cashAlloc);
+                document.getElementById('goldTargetDisplay').innerText = formatMoney(goldAlloc);
+                
+                let expensePct = 0, investPct = 0;
+                if(dashboardData.income > 0) {
+                    expensePct = Math.min((dashboardData.expense / dashboardData.income) * 100, 100);
+                    investPct = 100 - expensePct;
+                }
+                document.getElementById('expensePct').innerText = expensePct.toFixed(0) + "%";
+                document.getElementById('investPct').innerText = investPct.toFixed(0) + "%";
+            }
+        }
+
+        // --- LOGIC: PLANNER (ENHANCED) ---
+        function calcPlanner() {
+            const income = plannerData.income || 0;
+            const personal = plannerData.personalExp || 0;
+            const family = plannerData.familySupport || 0;
+            const savings = plannerData.currentSavings || 0;
+            
+            // Zakat Calculation
+            const zakat = plannerData.zakatActive ? (income * 0.025) : 0;
+            
+            // Total Load & Surplus
+            const totalLoad = personal + family + zakat;
+            let surplus = income - totalLoad;
+            
+            // Deficit Handling
+            const isDeficit = surplus < 0;
+            const displaySurplus = Math.max(0, surplus);
+            
+            // Update Summary Cards
+            document.getElementById('sumIncome').innerText = formatMoney(income);
+            document.getElementById('sumLoad').innerText = formatMoney(totalLoad);
+            document.getElementById('sumNet').innerText = isDeficit ? '-' : formatMoney(surplus);
+            
+            // Update Deficit Badge
+            const deficitBadge = document.getElementById('deficitBadge');
+            if(deficitBadge) {
+                if(isDeficit) deficitBadge.classList.remove('hidden');
+                else deficitBadge.classList.add('hidden');
+            }
+
+            // Calculate Percentages for Breakdown
+            const totalForCalc = Math.max(income, totalLoad); 
+            const safeBase = totalForCalc > 0 ? totalForCalc : 1;
+            
+            const pPersonal = (personal / safeBase) * 100;
+            const pFamily = (family / safeBase) * 100;
+            const pZakat = (zakat / safeBase) * 100;
+            const pInvest = isDeficit ? 0 : (surplus / safeBase) * 100;
+
+            // Update Breakdown UI (Text & Bars)
+            updateBreakdownUI('Personal', pPersonal, personal);
+            updateBreakdownUI('Family', pFamily, family);
+            updateBreakdownUI('Zakat', pZakat, zakat);
+            updateBreakdownUI('Invest', pInvest, displaySurplus);
+
+            // Zakat Visual State
+            const rowZakat = document.getElementById('rowZakat');
+            if(rowZakat) {
+                if (plannerData.zakatActive) rowZakat.classList.remove('hidden');
+                else rowZakat.classList.add('hidden');
+            }
+
+            // --- Emergency Fund & Runway ---
+            const fixedLoad = personal + family; 
+            const targetEF = fixedLoad * 6;
+            const percentEF = targetEF > 0 ? Math.min((savings / targetEF) * 100, 100) : (savings > 0 ? 100 : 0);
+            
+            if(document.getElementById('efBar')) {
+                document.getElementById('efBar').style.width = percentEF + '%';
+                document.getElementById('efPercent').innerText = percentEF.toFixed(0) + '%';
+                document.getElementById('efTarget').innerText = formatMoney(targetEF);
+                document.getElementById('efCurrent').innerText = formatMoney(savings);
+            }
+
+            let runway = fixedLoad > 0 ? (savings / fixedLoad) : (savings > 0 ? 12 : 0);
+            let runwayText = fixedLoad > 0 ? runway.toFixed(1) + " Bulan" : "12+ Bulan";
+            if(runway > 12) runwayText = "12+ Bulan";
+            
+            document.getElementById('runwayText').innerText = runwayText;
+            const runwayBar = document.getElementById('runwayBar');
+            if(runwayBar) {
+                const visualRunway = Math.min((runway / 12) * 100, 100);
+                runwayBar.style.width = visualRunway + '%';
+                // Color logic
+                runwayBar.className = `progress-bar-fill h-full rounded-full relative ${runway < 3 ? 'bg-danger' : runway < 6 ? 'bg-warning' : 'bg-success'}`;
+            }
+
+            // Update Chart
+            if (globalState.currentView === 'planner') {
+                updatePlannerCharts(personal, family, zakat, displaySurplus, totalLoad, isDeficit);
+            }
+        }
+
+        function updateBreakdownUI(type, pct, val) {
+            const elPct = document.getElementById(`pct${type}`);
+            const elVal = document.getElementById(`val${type}`);
+            if(elPct) elPct.innerText = pct.toFixed(1) + '%';
+            if(elVal) elVal.innerText = formatMoney(val);
+        }
+
+        function updatePlannerCharts(personal, family, zakat, surplus, totalLoad, isDeficit) {
+            const ctx = document.getElementById('expenseChart');
+            if (!ctx) return;
+
+            // Update Center Text
+            const centerText = document.getElementById('centerLoadText');
+            if(centerText) centerText.innerText = formatMoney(totalLoad);
+
+            let data, colors, labels;
+
+            if (isDeficit) {
+                // Deficit State: Full Red Ring
+                data = [1];
+                colors = ['#E11D48']; // Danger Red
+                labels = ['Defisit'];
+            } else if (personal + family + zakat + surplus === 0) {
+                 // Empty State
+                data = [1];
+                colors = ['#E5E7EB'];
+                labels = ['Kosong'];
+            } else {
+                data = [personal, family, zakat, surplus];
+                colors = [
+                    '#E11D48', // Pribadi (Rose)
+                    '#F97316', // Keluarga (Amber)
+                    '#0D9488', // Zakat (Teal)
+                    '#4318FF'  // Investasi (Indigo)
+                ];
+                labels = ['Pribadi', 'Keluarga', 'Zakat', 'Investasi'];
+            }
+
+            if (expenseChartInstance) {
+                expenseChartInstance.data.datasets[0].data = data;
+                expenseChartInstance.data.datasets[0].backgroundColor = colors;
+                expenseChartInstance.data.labels = labels;
+                expenseChartInstance.update();
+            } else {
+                expenseChartInstance = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: colors,
+                            borderWidth: 0,
+                            hoverOffset: 4,
+                            borderRadius: 4,
+                            cutout: '75%' // Thinner ring for modern look
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                enabled: !globalState.privacyMode,
+                                callbacks: {
+                                    label: function(ctx) {
+                                        let val = ctx.parsed;
+                                        if(ctx.label === 'Defisit' || ctx.label === 'Kosong') return ctx.label;
+                                        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(val);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // --- HANDLERS ---
+        function handleInput(el, scope, field) {
+            const val = parseInput(el.value);
+            
+            if (scope === 'dashboard') {
+                dashboardData[field] = val;
+                saveData('dashboard');
+                calcDashboard();
+            } else {
+                plannerData[field] = val;
+                saveData('planner');
+                calcPlanner();
+            }
+            
+            el.value = formatInputDisplay(val);
+        }
+
+        function toggleZakat(event) {
+            // Can be called via click on div (event is undefined or MouseEvent) or direct change
+            const checkbox = document.getElementById('planZakatToggle');
+            if (event && event.type === 'click' && event.target !== checkbox) {
+                 // Prevent double toggle if clicking label/div
+                 return; 
+            }
+            
+            plannerData.zakatActive = checkbox.checked;
+            saveData('planner');
+            calcPlanner();
+        }
+
+        function handleSlider(el) {
+            let val = parseInt(el.value);
+            const alertBox = document.getElementById('safetyAlert');
+            if (val > 75) {
+                if(alertBox) alertBox.classList.remove('hidden');
+                el.classList.add('slider-danger');
+                if (navigator.vibrate) navigator.vibrate(50);
+            } else {
+                if(alertBox) alertBox.classList.add('hidden');
+                el.classList.remove('slider-danger');
+            }
+
+            dashboardData.goldRatio = val;
+            
+            document.getElementById('sliderTrack').style.width = val + "%";
+            document.getElementById('cashPctText').innerText = `Tunai: ${100 - val}%`;
+            document.getElementById('goldPctText').innerText = `Emas: ${val}%`;
+            
+            saveData('dashboard');
+            calcDashboard();
+        }
+
+        function togglePrivacy() {
+            globalState.privacyMode = !globalState.privacyMode;
+            saveData('prefs');
+            
+            const btn = document.getElementById('privacyBtn');
+            const icon = globalState.privacyMode ? 'eye' : 'eye-off';
+            const text = globalState.privacyMode ? 'Lihat Saldo' : 'Sembunyi';
+            
+            btn.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4"></i><span class="hidden md:inline">${text}</span><span class="md:hidden">${globalState.privacyMode ? 'Lihat' : 'Hide'}</span>`;
+            
+            lucide.createIcons();
+            
+            calcDashboard();
+            calcPlanner();
+        }
+
+        // --- BOOTSTRAP ---
+        window.addEventListener('DOMContentLoaded', () => {
+            loadAllData();
+            lucide.createIcons();
+            
+            // UI Sync for Privacy Button
+            const btn = document.getElementById('privacyBtn');
+            const icon = globalState.privacyMode ? 'eye' : 'eye-off';
+            const text = globalState.privacyMode ? 'Lihat Saldo' : 'Sembunyi';
+            btn.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4"></i><span class="hidden md:inline">${text}</span><span class="md:hidden">${globalState.privacyMode ? 'Lihat' : 'Hide'}</span>`;
+            lucide.createIcons();
+        });
+    </script>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>
